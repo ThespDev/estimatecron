@@ -3,6 +3,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+/*
+ crontab=file
+ minute - int (0 to 59)
+ hour - int (0 to 24)
+ date - int ()
+ 
+ */
+
 //struct Program{
 //	int minutes;
 //	char[41] name;
