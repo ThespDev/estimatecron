@@ -1,3 +1,7 @@
+//  CITS2002 Project 1 2022
+//  Student1:   23137892   NAYDENOV   PABLO
+//  Student2:   22332371   BRYDON   RYAN
+
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -15,12 +19,32 @@
  estimates- file
  minutes - int
  command - string
- */
+ 
 
-//struct Program{
+ * Open and read crontab-file and estimates-file
+ 
+ * Each contain at most 20 Non-comment lines and each line will be at most 100 characters long and each command name will be atleast 40 charaters long
+
+ * Check for data errors in both files - if any errors only the first should be reported and then the program should terminate
+ 
+ * Every command name appearing in the crontab-file will also appear in the estimates-file
+ 
+ * Skip all "comment" lines that begin with a - #
+ 
+ * The project should simuate the execution of the commands in the crontab-file for the month specified onn the command-line. (No consideration for leap-year or leap seconds needed)
+ 
+ * At most 20 processes will ever be executing at the same time (during the same minute) and mutilple instances of the same command may run at the same time
+ 
+ * The program only needs to simulate the execution pf processes for the requested month and current year and all processes terminated before the end of the requested month
+
+ * Given the month we need to determine - commands that run in that month nd count how many times each command runs
+ 
+*/
+
+// struct Program{
 //	int minutes;
 //	char[41] name;
-//};
+// };
 
 
 //struct Program programs[20];
