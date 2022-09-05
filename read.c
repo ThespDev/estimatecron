@@ -4,13 +4,17 @@
 #include <stdlib.h>
 
 /*
- crontab=file
+ crontab-file
  minute - int (0 to 59)
  hour - int (0 to 24)
- date - int ()
+ day - int (0 to 31) this is dependent on the day obviously
+ month - int (0 to 12)
+ day_name - string(Sun, Mon, Tues etc)
+ command - string
  
- 
- 
+ estimates- file
+ minutes - int
+ command - string
  */
 
 //struct Program{
