@@ -74,7 +74,7 @@ void readfile(char *file_name[]){
                
     // CHECK FOR END OF FILE (EOF) OR ANY ERROR WHILE READING
     char line [MAX_LINES];
-    while(!eof(file) && !ferror(file)){
+    while(!eof(the_file) && !ferror(the_file)){
             //CHECK IF NUMBER OF LINES < MAX_LINES
             if(fgets(tokens[i], MAX_LENGTH, the_file) != NULL){
                 i++;
