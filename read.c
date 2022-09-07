@@ -12,7 +12,7 @@
 
 #define DEFAULT_YEAR 2022
 #define NUMBER_WEEKS 52
-#define DAYS_PER_WEEK 7
+#define DAYS_PER_WEEK fine 7
 /*
 crontab-file
 minutes - int (0 to 59)
