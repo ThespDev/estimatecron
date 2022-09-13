@@ -15,6 +15,11 @@
 #define CURRENT_YEAR 2022
 #define DAYS_PER_WEEK fine 7
 
+int daysInMonth(int month) {
+  int daysOfMonths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  return daysOfMonths[month];
+}
+
 int first_day_of_month(int month, int year) {
   struct tm tm;
 
@@ -35,7 +40,8 @@ void simulateMonth(int month) {
   int hour = 0;
   int day = 1;
   int dayofWeek = first_day_of_month(month, CURRENT_YEAR);
-  for (int i = 0; i < 44640; i++) {
+  int minutesinMonth = daysInMonth(month) * 24 * 60;
+  for (int i = 0; i < minutesinMonth; i++) {
     printf("Iteration : %d\n Minute: %d , Hour: %d , Day: %d , DayOfWeek: %d\n",
            i, minute, hour, day, dayofWeek);
     // DO the Simulation of Commands here
@@ -54,4 +60,7 @@ void simulateMonth(int month) {
   }
 }
 
-int main(int argc, char *argv[]) { return 0; }
+int main(int argc, char *argv[]) {
+  simulateMonth(atoi(argv[1]));
+  return 0;
+}
