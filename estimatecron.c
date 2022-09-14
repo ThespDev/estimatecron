@@ -117,6 +117,7 @@ void simulateMonth(int month) {
         dayofWeek = dayofWeek % 7;
       }
     }
+      
   }
 }
 
