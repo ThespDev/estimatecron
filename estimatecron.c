@@ -31,15 +31,28 @@ struct ScheduledTask{
 	int dayofWeek;
 };
 
-struct estimate{
+struct Estimate{
 	char programName[MAX_COMMAND_LENGTH +1];
 	int minutes;
 };
 
+struct Estimate estimates[MAX_COMMAND_COUNT];
+struct ScheduledTask tasks[MAX_COMMAND_COUNT];
+
 void parseData(struct Data filedata, int fileNum){
 	switch(fileNum){
+		//ESTIMATE PARSING
 		case 1:
+			for(int i = 0; i < 1; i++){
+			char *word = strtok(filedata.file_info[i]," \t\n\0");
+			strcpy(estimates[i].programName,word);
+			word = strtok(NULL," \t\n\0");
+			estimates[i].minutes = atoi(word);
+			}
+			printf("THIS IS STORED IN THE STRUCT: %s\n", estimates[0].programName);
+			printf("THIS IS STORED IN THE STRUCT: %d\n", estimates[0].minutes);
 			break;
+		//SCHEDULE PARSING
 		case 2:
 			break;
 	}
@@ -138,5 +151,6 @@ void simulateMonth(int month) {
 int main(int argc, char *argv[]) {
   struct Data filedata = readfile(argv[1]);
   printf("LINE 1: %s\n",filedata.file_info[0]);
+  parseData(filedata,1);
   return 0;
 }
