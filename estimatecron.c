@@ -29,15 +29,20 @@ struct ScheduledTask{
 	int day;
 	int month;
 	int dayofWeek;
-}
+};
 
 struct estimate{
 	char programName[MAX_COMMAND_LENGTH +1];
 	int minutes;
-}
+};
 
-void parseData(struct Data filedata){
-
+void parseData(struct Data filedata, int fileNum){
+	switch(fileNum){
+		case 1:
+			break;
+		case 2:
+			break;
+	}
 }
 
 // OPEN AND READ THE crontab-file AND estimates-file
@@ -60,6 +65,15 @@ struct Data readfile(char file_name[]){
     // CHECK FOR END OF FILE (EOF) OR ANY ERROR WHILE READING
     char line [MAX_LINE_LENGTH];
     while(fgets(line,sizeof line, file_data) !=  NULL){
+	    int charCounter = 0;
+	    while(isspace(line[charCounter])){
+		charCounter++;
+	    }
+	    //CHECKING FIRST NON WHITESPACE FOR COMMENT LINE
+	    if (line[charCounter] == '#'){
+		printf("COMMENT LINE DETECTED: %s\n",line);
+		continue;
+	    }
 	    strcpy(data.file_info[line_number],line);
 	    line_number++;
 	}
