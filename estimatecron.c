@@ -20,6 +20,7 @@ THROW ERROR IF TASK IN schedule BUT NOT estimates*/
 
 struct Data{
 	char file_info[MAX_COMMAND_COUNT][MAX_LINE_LENGTH];
+	int linecount;
 };
 // * == -1
 struct ScheduledTask{
@@ -43,20 +44,119 @@ void parseData(struct Data filedata, int fileNum){
 	switch(fileNum){
 		//ESTIMATE PARSING
 		case 1:
-			for(int i = 0; i < 1; i++){
+			for(int i = 0; i < filedata.linecount+1; i++){
 			char *word = strtok(filedata.file_info[i]," \t\n\0");
 			strcpy(estimates[i].programName,word);
 			word = strtok(NULL," \t\n\0");
 			estimates[i].minutes = atoi(word);
 			}
-			printf("THIS IS STORED IN THE STRUCT: %s\n", estimates[0].programName);
-			printf("THIS IS STORED IN THE STRUCT: %d\n", estimates[0].minutes);
+			printf("THIS IS STORED IN THE STRUCT: %s\n", estimates[1].programName);
+			printf("THIS IS STORED IN THE STRUCT: %d\n", estimates[1].minutes);
 			break;
 		//SCHEDULE PARSING
 		case 2:
+			for(int i = 0; i < filedata.linecount+1; i++){
+			//MINUTES (0-59)
+			char *word = strtok(filedata.file_info[i]," \t\n\0");
+			if(word == '*'){
+				tasks.minute = -1;
+			}
+
+			else{
+			if(atoi(word) < 0 || atoi(word) > 59){
+				fprintf(stderr,"%i is not a valid minute\n",atoi(word);
+			}
+			tasks.minute = atoi(word);
+			}
+			
+			//HOURS (0-23)
+			word = strtok(NULL," \t\n\0");
+			if (word == '*'){
+				tasks.hour = -1;
+			else{
+				if(atoi(word) < 0 || atoi(word) > 23){
+					fprintf(stderr,"%i is not a valid hour\n",atoi(word);
+				}
+			tasks.hour = atoi(word);
+			}
+			}
+			//DAY OF MONTH (1-31)
+			word = strtok(NULL," \t\n\0");
+			int days = atoi(word);
+
+			//MONTH (0-11 OR jan,feb....)
+			word = strtok(NULL," \t\n\0");
+
+			
+			
+			
 			break;
 	}
 }
+
+int monthConverter(char month[]){
+	if (strcmp(month, "jan") == 0) {
+  		return 0;
+	}
+	else if (strcmp(month, "feb") == 0) {
+  		return 1;
+	}
+	else if (strcmp(month, "mar") == 0) {
+  		return 2;
+	}
+	else if (strcmp(month, "apr") == 0) {
+  		return 3;
+	}
+	else if (strcmp(month, "may") == 0) {
+  		return 4;
+	}
+	else if (strcmp(month, "jun") == 0) {
+  		return 5;
+	}
+	else if (strcmp(month, "jul") == 0) {
+  		return 6;
+	}
+	else if (strcmp(month, "aug") == 0) {
+  		return 7;
+	}
+	else if (strcmp(month, "sep") == 0) {
+  		return 8;
+	}
+	else if (strcmp(month, "oct") == 0) {
+  		return 9;
+	}
+	else if (strcmp(month, "nov") == 0) {
+  		return 10;
+	}
+	else if (strcmp(month, "dec") == 0) {
+  		return 11;
+	}
+}
+
+int dayConverter(char day[]){
+	if (strcmp(day, "sun") == 0) {
+  		return 0;
+	}
+	else if (strcmp(day, "mon") == 0) {
+  		return 1;
+	}
+	else if (strcmp(day, "tue") == 0) {
+  		return 2;
+	}
+	else if (strcmp(day, "wed") == 0) {
+  		return 3;
+	}
+	else if (strcmp(day, "thu") == 0) {
+  		return 4;
+	}
+	else if (strcmp(day, "fri") == 0) {
+  		return 5;
+	}
+	else if (strcmp(day, "sat") == 0) {
+  		return 6;
+	}
+}
+
 
 // OPEN AND READ THE crontab-file AND estimates-file
 struct Data readfile(char file_name[]){
@@ -90,6 +190,7 @@ struct Data readfile(char file_name[]){
 	    strcpy(data.file_info[line_number],line);
 	    line_number++;
 	}
+    data.linecount = line_number;
     //CLOSE FILE
     fclose(file_data);
     return data;
