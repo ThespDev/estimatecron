@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <stdbool.h>
 
 #define MAX_LINE_LENGTH 100
 #define MAX_COMMAND_LENGTH 40
@@ -300,26 +301,64 @@ int first_day_of_month(int month) {
   return tm.tm_wday; // 0=Sun, 1=Mon, .....
 }
 
-void simulateMonth(int month) {
-  int minute = 0;
-  int hour = 0;
-  int day = 1;
-  int dayofWeek = first_day_of_month(month);
+void simulateMonth(int month, int numTasks, int numEstimates) {
+  int currMinute = 0;
+  int currHour = 0;
+  int currDay = 1;
+  int currMonth = month;
+  int currDayOfWeek = first_day_of_month(month);
   int minutesinMonth = daysInMonth(month) * 24 * 60;
+  int timesRun[numTasks];
+  int processTimers[20];
+  int processCounter = 0;
   for (int i = 0; i < minutesinMonth; i++) {
-    printf("Iteration : %d\n Minute: %d , Hour: %d , Day: %d , DayOfWeek: %d\n",
-           i, minute, hour, day, dayofWeek);
     // DO THE SIMULATION OF COMMANDS HERE
+  for (int j = 0; j<numTasks; j++){
+    	if((tasks[j].minute == currMinute || tasks[j].minute == -1) 
+	&& (tasks[j].hour == currHour || tasks[j].hour  == -1)
+	&& (tasks[j].day == currDay || tasks[j].day  == -1)
+	&& (tasks[j].month == currMonth || tasks[j].month  == -1)
+	&& (tasks[j].dayOfWeek == currDayOfWeek || tasks[j].dayOfWeek  == -1)){
+	
+	for(int k = 0; k<numEstimates; k++){
+		bool taskFound = false;
+		if(estimates[k].programName == tasks[j].programName){
+			taskFound = true;
+		
+		if (taskFound){
+			bool listFull = false;
+			int l = 0;
+			while(processTimers[l] != 0){
+				l++;
+				if (l > 19){
+				listFull = true;
+				break;
+				}
+			}
+			if(!listFull){
+				processTimers[l] = estimates[k].minutes;
+				timesRun[j]++;
+				processCounter++;
+			}
+		}
+		else if (!taskFound){
+		fprintf(stderr,"There is no given estimate for the task: %s\n",tasks[j].programName);
+		exit(EXIT_FAILURE);
+		}
 
-    minute++;
-    minute = minute % 60;
-    if (minute == 0) {
-      hour++;
-      hour = hour % 24;
-      if (hour == 0) {
-        day++;
-        dayofWeek++;
-        dayofWeek = dayofWeek % 7;
+		}
+	}
+	}
+    }
+    currMinute++;
+    currMinute = currMinute % 60;
+    if (currMinute == 0) {
+      currHour++;
+      currHour = currHour % 24;
+      if (currHour == 0) {
+        currDay++;
+        currDayOfWeek++;
+        currDayOfWeek = currDayOfWeek % 7;
       }
     }
       
@@ -330,7 +369,7 @@ int main(int argc, char *argv[]) {
   struct Data crontab = readfile(argv[2]);
   struct Data estimates = readfile(argv[3]);
   parseData(estimates,1);
-  printf("Estimates ran without error\n");
   parseData(crontab,2);
+  simulateMonth(atoi(argv[1]),crontab.linecount,estimates.linecount);
   return 0;
 }
