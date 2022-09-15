@@ -149,8 +149,6 @@ void parseData(struct Data filedata, int fileNum){
 			word = strtok(NULL," \t\n\0");
 			estimates[i].minutes = atoi(word);
 			}
-			printf("THIS IS STORED IN THE STRUCT: %s\n", estimates[1].programName);
-			printf("THIS IS STORED IN THE STRUCT: %d\n", estimates[1].minutes);
 			break;
 		//SCHEDULE PARSING
 		case 2:
@@ -228,10 +226,6 @@ void parseData(struct Data filedata, int fileNum){
 				word = strtok(NULL," \t\n\0");
 				strcpy(tasks[i].programName,word);
 			}
-			
-
-			
-			
 			break;
 	}
 }
@@ -263,7 +257,6 @@ struct Data readfile(char file_name[]){
 	    }
 	    //CHECKING FIRST NON WHITESPACE FOR COMMENT LINE
 	    if (line[charCounter] == '#'){
-		printf("COMMENT LINE DETECTED: %s\n",line);
 		continue;
 	    }
 	    strcpy(data.file_info[line_number],line);
@@ -298,23 +291,28 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
   int currDayOfWeek = first_day_of_month(month);
   int minutesinMonth = daysInMonth(month) * 24 * 60;
   int timesRun[numTasks];
+  memset(timesRun, 0, sizeof(timesRun));
   int processTimers[20];
+  memset(processTimers, 0, sizeof(processTimers));
   int processCounter = 0;
   int currentMax = 0;
   for (int i = 0; i < minutesinMonth; i++) {
-    // DO THE SIMULATION OF COMMANDS HERE
-  for (int j = 0; j<numTasks; j++){
+  //CHECK IF COMMAND NEEDS TO BE RUN
+	for (int j = 0; j<numTasks; j++){
     	if((tasks[j].minute == currMinute || tasks[j].minute == -1) 
 	&& (tasks[j].hour == currHour || tasks[j].hour  == -1)
 	&& (tasks[j].day == currDay || tasks[j].day  == -1)
 	&& (tasks[j].month == currMonth || tasks[j].month  == -1)
 	&& (tasks[j].dayOfWeek == currDayOfWeek || tasks[j].dayOfWeek  == -1)){
 	
+	bool taskFound = false;
+	int foundIndex;
 	for(int k = 0; k<numEstimates; k++){
-		bool taskFound = false;
-		if(estimates[k].programName == tasks[j].programName){
+		if(strcmp(estimates[k].programName,tasks[j].programName) == 0){
 			taskFound = true;
-		
+			foundIndex = k;
+		}
+	}
 		if (taskFound){
 			bool listFull = false;
 			int l = 0;
@@ -326,8 +324,9 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
 				}
 			}
 			if(!listFull){
-				processTimers[l] = estimates[k].minutes;
-				timesRun[j]++;
+				printf("THE PROGRAM %s WAS RUN\n",tasks[j].programName);
+				processTimers[l] = estimates[foundIndex].minutes;
+				timesRun[j] += 1;
 				processCounter++;
 			}
 		}
@@ -335,9 +334,7 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
 		fprintf(stderr,"There is no given estimate for the task: %s\n",tasks[j].programName);
 		exit(EXIT_FAILURE);
 		}
-
-		}
-	}
+	
 	}
     }
   if (processCounter > currentMax){
@@ -370,9 +367,10 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
   int mostRun = 0;
   int mostRunIndex = 0;
   int commandsInvoked = 0;
-  for (int i = 0; i<20; i++){
+  for (int i = 0; i<numTasks; i++){
 	commandsInvoked += timesRun[i];
 	if (timesRun[i] > mostRun){
+		mostRun = timesRun[i];
 		mostRunIndex = i;
 	}
   }
@@ -383,9 +381,13 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
 
 int main(int argc, char *argv[]) {
   struct Data crontab = readfile(argv[2]);
+  printf("crontab read\n");
   struct Data estimates = readfile(argv[3]);
+  printf("estimates read\n");
   parseData(estimates,1);
+  printf("estimates parsed\n");
   parseData(crontab,2);
+  printf("crontab parsed\n");
   simulateMonth(atoi(argv[1]),crontab.linecount,estimates.linecount);
   return 0;
 }
