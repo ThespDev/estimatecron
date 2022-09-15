@@ -228,15 +228,7 @@ void parseData(struct Data filedata, int fileNum){
 				word = strtok(NULL," \t\n\0");
 				strcpy(tasks[i].programName,word);
 			}
-			for (int i = 0; i<6;i++){
-			printf("This is the minutes %d\n",tasks[i].minute);
-			printf("This is the hours %d\n",tasks[i].hour);
-			printf("This is the days %d\n",tasks[i].day);
-			printf("This is the month %d\n",tasks[i].month);
-			printf("This is the day of the week %d\n",tasks[i].dayOfWeek);
-			printf("This is the name %s\n",tasks[i].programName);
-			printf("------------------------------------------------------\n");
-			}
+			
 
 			
 			
@@ -294,9 +286,6 @@ int first_day_of_month(int month) {
   tm.tm_mon = month; // 0=Jan, 1=Feb, ....
 	tm.tm_year = CURRENT_YEAR-1900;
   mktime(&tm);
-  printf("CURRENT YEAR %d\n",tm.tm_year);
-  printf("CURRENT MONTH %d\n",tm.tm_mon);
-
   //  RETURN THE INTEGER MONTH VALUE
   return tm.tm_wday; // 0=Sun, 1=Mon, .....
 }
@@ -311,6 +300,7 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
   int timesRun[numTasks];
   int processTimers[20];
   int processCounter = 0;
+  int currentMax = 0;
   for (int i = 0; i < minutesinMonth; i++) {
     // DO THE SIMULATION OF COMMANDS HERE
   for (int j = 0; j<numTasks; j++){
@@ -350,7 +340,21 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
 	}
 	}
     }
-    currMinute++;
+  if (processCounter > currentMax){
+	currentMax =  processCounter;
+    }  
+	currMinute++;
+    for (int j = 0; j<20; j++){
+	if (processTimers[j] == 0){
+		continue;
+	}
+	else{
+		processTimers[j]--;
+		if (processTimers[j] == 0){
+			processCounter--;
+		}
+	}
+    }
     currMinute = currMinute % 60;
     if (currMinute == 0) {
       currHour++;
@@ -363,6 +367,18 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
     }
       
   }
+  int mostRun = 0;
+  int mostRunIndex = 0;
+  int commandsInvoked = 0;
+  for (int i = 0; i<20; i++){
+	commandsInvoked += timesRun[i];
+	if (timesRun[i] > mostRun){
+		mostRunIndex = i;
+	}
+  }
+
+  printf("The most frequently executed command was: %s\n The total number of commands invoked was: %d\n The max number of commands running at a time was: %d\n",
+	tasks[mostRunIndex].programName,commandsInvoked,currentMax);
 }
 
 int main(int argc, char *argv[]) {
