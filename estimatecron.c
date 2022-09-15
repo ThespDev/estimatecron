@@ -15,8 +15,8 @@
 #define CURRENT_YEAR 2022
 #define DAYS_PER_WEEK fine 7
 
-//errors:
-//throw error if task in schedule but not estimates
+/*ERRORS:
+THROW ERROR IF TASK IN schedule BUT NOT estimates*/
 
 struct Data{
 	char file_info[MAX_COMMAND_COUNT][MAX_LINE_LENGTH];
@@ -66,8 +66,8 @@ struct Data readfile(char file_name[]){
     //OPEN THE FILE
     FILE *file_data = fopen(file_name,"r");
 
-    //PRINT ERROR IF UNABLE TO OPEN FILE
-    /* Check for data errors in both files - if any errors only the first should be reported and then the program should terminate */
+    /*PRINT ERROR IF UNABLE TO OPEN FILE
+     CHECK FOR DATA ERRORS IN BOTH FILES - IF ANY ERRORS ONLY THE FIRST SHOULD BE REPORTED AND THEN THE PROGRAM SHOULD TERMINATE */
     if(file_data == NULL){
         printf("Unable to open the file %s\n", file_name);
         exit(EXIT_FAILURE);
@@ -131,7 +131,7 @@ void simulateMonth(int month) {
   for (int i = 0; i < minutesinMonth; i++) {
     printf("Iteration : %d\n Minute: %d , Hour: %d , Day: %d , DayOfWeek: %d\n",
            i, minute, hour, day, dayofWeek);
-    // DO the Simulation of Commands here
+    // DO THE SIMULATION OF COMMANDS HERE
 
     minute++;
     minute = minute % 60;
