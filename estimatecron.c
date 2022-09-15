@@ -40,60 +40,6 @@ struct Estimate{
 struct Estimate estimates[MAX_COMMAND_COUNT];
 struct ScheduledTask tasks[MAX_COMMAND_COUNT];
 
-void parseData(struct Data filedata, int fileNum){
-	switch(fileNum){
-		//ESTIMATE PARSING
-		case 1:
-			for(int i = 0; i < filedata.linecount+1; i++){
-			char *word = strtok(filedata.file_info[i]," \t\n\0");
-			strcpy(estimates[i].programName,word);
-			word = strtok(NULL," \t\n\0");
-			estimates[i].minutes = atoi(word);
-			}
-			printf("THIS IS STORED IN THE STRUCT: %s\n", estimates[1].programName);
-			printf("THIS IS STORED IN THE STRUCT: %d\n", estimates[1].minutes);
-			break;
-		//SCHEDULE PARSING
-		case 2:
-			for(int i = 0; i < filedata.linecount+1; i++){
-			//MINUTES (0-59)
-			char *word = strtok(filedata.file_info[i]," \t\n\0");
-			if(word == '*'){
-				tasks.minute = -1;
-			}
-
-			else{
-			if(atoi(word) < 0 || atoi(word) > 59){
-				fprintf(stderr,"%i is not a valid minute\n",atoi(word);
-			}
-			tasks.minute = atoi(word);
-			}
-			
-			//HOURS (0-23)
-			word = strtok(NULL," \t\n\0");
-			if (word == '*'){
-				tasks.hour = -1;
-			else{
-				if(atoi(word) < 0 || atoi(word) > 23){
-					fprintf(stderr,"%i is not a valid hour\n",atoi(word);
-				}
-			tasks.hour = atoi(word);
-			}
-			}
-			//DAY OF MONTH (1-31)
-			word = strtok(NULL," \t\n\0");
-			int days = atoi(word);
-
-			//MONTH (0-11 OR jan,feb....)
-			word = strtok(NULL," \t\n\0");
-
-			
-			
-			
-			break;
-	}
-}
-
 int monthConverter(char month[]){
 	if (strcmp(month, "jan") == 0) {
   		return 0;
@@ -131,6 +77,17 @@ int monthConverter(char month[]){
 	else if (strcmp(month, "dec") == 0) {
   		return 11;
 	}
+	else if (atoi(month) >= 0 && atoi(month) < 12){
+		return atoi(month);
+	}
+	else if (*month == '*'){
+		return -1;
+	}
+	else{
+		fprintf(stderr,"%s is not a valid month\n",month);
+		exit(EXIT_FAILURE);
+
+	}
 }
 
 int dayConverter(char day[]){
@@ -154,6 +111,102 @@ int dayConverter(char day[]){
 	}
 	else if (strcmp(day, "sat") == 0) {
   		return 6;
+	}
+	else if (*day == '*'){
+		return -1;
+	}
+	else if (isdigit(day) && atoi(day) >= 0 && atoi(day) < 7 ){
+		return atoi(day);
+	}
+	else{
+		fprintf(stderr,"%s is not a valid day of the week\n",day);
+		exit(EXIT_FAILURE);
+	}
+	
+}
+
+//RETURNS THE AMOUNT OF DAYS IN A MONTH BASED OFF INTEGER GIVEN (0-11)
+int daysInMonth(int month) {
+  if (month < 0 || month > 11){
+	fprintf(stderr,"%i is not a valid month\n",month);
+  }
+  int daysOfMonths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  return daysOfMonths[month];
+}
+
+
+
+
+void parseData(struct Data filedata, int fileNum){
+	switch(fileNum){
+		//ESTIMATE PARSING
+		case 1:
+			for(int i = 0; i < filedata.linecount+1; i++){
+			char *word = strtok(filedata.file_info[i]," \t\n\0");
+			strcpy(estimates[i].programName,word);
+			word = strtok(NULL," \t\n\0");
+			estimates[i].minutes = atoi(word);
+			}
+			printf("THIS IS STORED IN THE STRUCT: %s\n", estimates[1].programName);
+			printf("THIS IS STORED IN THE STRUCT: %d\n", estimates[1].minutes);
+			break;
+		//SCHEDULE PARSING
+		case 2:
+			for(int i = 0; i < filedata.linecount+1; i++){
+				//MINUTES (0-59)
+				char *word = strtok(filedata.file_info[i]," \t\n\0");
+				if(*word == '*'){
+					tasks->minute = -1;
+				}
+
+				else{
+				if(atoi(word) < 0 || atoi(word) > 59){
+					fprintf(stderr,"%s is not a valid minute\n",word);
+					exit(EXIT_FAILURE);
+
+				}
+				tasks->minute = atoi(word);
+				}
+				
+				//HOURS (0-23)
+				word = strtok(NULL," \t\n\0");
+				if (*word == '*'){
+					tasks->hour = -1;
+				}
+				else{
+					if(atoi(word) < 0 || atoi(word) > 23){
+						fprintf(stderr,"%s is not a valid hour\n",word);
+						exit(EXIT_FAILURE);
+					}
+				tasks->hour = atoi(word);
+				}
+				
+				//DAY OF MONTH (1-31)
+				word = strtok(NULL," \t\n\0");
+				int days = atoi(word);
+				//MONTH (0-11 OR jan,feb....)
+				word = strtok(NULL," \t\n\0");
+				int month = monthConverter(word);
+				if (month >= 0 && month < 12){
+					int daysInMonth = daysInMonth(month);
+					tasks->month = month;
+					if (days<=daysInMonth && days>=0){
+						tasks->day = days;
+					}
+					else{
+						fprintf(stderr,"%d is not a valid number of days\n",days);
+						exit(EXIT_FAILURE);
+					}
+
+				}
+				else{
+					tasks->month = month;
+				}
+			}
+
+			
+			
+			break;
 	}
 }
 
@@ -194,15 +247,6 @@ struct Data readfile(char file_name[]){
     //CLOSE FILE
     fclose(file_data);
     return data;
-}
-
-//RETURNS THE AMOUNT OF DAYS IN A MONTH BASED OFF INTEGER GIVEN (0-11)
-int daysInMonth(int month) {
-  if (month < 0 || month > 11){
-	fprintf(stderr,"%i is not a valid month\n",month);
-  }
-  int daysOfMonths[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-  return daysOfMonths[month];
 }
 
 int first_day_of_month(int month) {
