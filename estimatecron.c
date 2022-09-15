@@ -67,7 +67,15 @@ int monthConverter(char month[]) {
     return 11;
   } else if (*month == '*') {
     return -1;
-  } else if (atoi(month) >= 0 && atoi(month) < 12) {
+  }
+  for (int j = 0; j < strlen(month); j++) {
+    if (!isdigit(month[j])) {
+      fprintf(stderr, "%s is not a valid month\n", month);
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  if (atoi(month) >= 0 && atoi(month) < 12) {
     return atoi(month);
   }
 
@@ -94,7 +102,14 @@ int dayConverter(char day[]) {
     return 6;
   } else if (*day == '*') {
     return -1;
-  } else if (isdigit(day) && atoi(day) >= 0 && atoi(day) < 7) {
+  }
+  for (int j = 0; j < strlen(day); j++) {
+    if (!isdigit(day[j])) {
+      fprintf(stderr, "%s is not a valid day of the week\n", day);
+      exit(EXIT_FAILURE);
+    }
+  }
+  if (atoi(day) >= 0 && atoi(day) < 7) {
     return atoi(day);
   } else {
     fprintf(stderr, "%s is not a valid day of the week\n", day);
@@ -119,6 +134,12 @@ void parseData(struct Data filedata, int fileNum) {
       char *word = strtok(filedata.file_info[i], " \t\n\0");
       strcpy(estimates[i].programName, word);
       word = strtok(NULL, " \t\n\0");
+      for (int j = 0; j < strlen(word); j++) {
+        if (!isdigit(word[j])) {
+          fprintf(stderr, "%s is not a valid amount of minutes\n", word);
+          exit(EXIT_FAILURE);
+        }
+      }
       estimates[i].minutes = atoi(word);
     }
     break;
@@ -132,6 +153,13 @@ void parseData(struct Data filedata, int fileNum) {
       }
 
       else {
+        for (int j = 0; j < strlen(word); j++) {
+          if (!isdigit(word[j])) {
+            fprintf(stderr, "%s is not a valid amount of minutes\n", word);
+            exit(EXIT_FAILURE);
+          }
+        }
+
         if (atoi(word) < 0 || atoi(word) > 59) {
           fprintf(stderr, "%s is not a valid minute\n", word);
           exit(EXIT_FAILURE);
@@ -143,6 +171,13 @@ void parseData(struct Data filedata, int fileNum) {
       if (*word == '*') {
         tasks->hour = -1;
       } else {
+        for (int j = 0; j < strlen(word); j++) {
+          if (!isdigit(word[j])) {
+            fprintf(stderr, "%s is not a valid amount of minutes\n", word);
+            exit(EXIT_FAILURE);
+          }
+        }
+
         if (atoi(word) < 0 || atoi(word) > 23) {
           fprintf(stderr, "%s is not a valid hour\n", word);
           exit(EXIT_FAILURE);
@@ -155,6 +190,13 @@ void parseData(struct Data filedata, int fileNum) {
       if (*word == '*') {
         days = -1;
       } else {
+        for (int j = 0; j < strlen(word); j++) {
+          if (!isdigit(word[j])) {
+            fprintf(stderr, "%s is not a valid day of the month\n", word);
+            exit(EXIT_FAILURE);
+          }
+        }
+
         days = atoi(word);
       }
       // MONTH (0-11 OR jan,feb....)
