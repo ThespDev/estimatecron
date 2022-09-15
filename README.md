@@ -22,5 +22,3 @@ Project info:
  + [project explanation](https://teaching.csse.uwa.edu.au/units/CITS2002/projects/project1.php)
  + [project clarifications](https://teaching.csse.uwa.edu.au/units/CITS2002/projects/project1-clarifications.php)
  + [Standard C Library Functions](https://www.mkompf.com/cplus/cliblist.html)
-## Todo
-+ [ ] Work out Todo items in person
