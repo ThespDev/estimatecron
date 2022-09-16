@@ -424,10 +424,8 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
     }
   }
 
-  printf("The most frequently executed command was: %s\n The total number of "
-         "commands invoked was: %d\n The max number of commands running at a "
-         "time was: %d\n",
-         tasks[mostRunIndex].programName, commandsInvoked, currentMax);
+  printf("%s %d %d \n", tasks[mostRunIndex].programName, commandsInvoked,
+         currentMax);
 }
 
 int main(int argc, char *argv[]) {
