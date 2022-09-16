@@ -441,6 +441,7 @@ int main(int argc, char *argv[]) {
   struct Data estimates = readfile(argv[3]);
   parseData(estimates, 1);
   parseData(crontab, 2);
-  simulateMonth(atoi(argv[1]), crontab.linecount, estimates.linecount);
+  int convertedMonth = monthConverter(argv[1]);
+  simulateMonth(convertedMonth, crontab.linecount, estimates.linecount);
   return 0;
 }
