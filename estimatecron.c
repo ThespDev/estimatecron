@@ -12,7 +12,6 @@
 #define MAX_LINE_LENGTH 100
 #define MAX_COMMAND_LENGTH 40
 #define MAX_COMMAND_COUNT 20
-#define CURRENT_YEAR 2022
 
 struct Data {
   char file_info[MAX_COMMAND_COUNT][MAX_LINE_LENGTH];
