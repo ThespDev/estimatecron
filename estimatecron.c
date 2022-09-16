@@ -12,17 +12,13 @@
 #define MAX_LINE_LENGTH 100
 #define MAX_COMMAND_LENGTH 40
 #define MAX_COMMAND_COUNT 20
-
 #define CURRENT_YEAR 2022
-
-/*ERRORS:
-THROW ERROR IF TASK IN schedule BUT NOT estimates*/
 
 struct Data {
   char file_info[MAX_COMMAND_COUNT][MAX_LINE_LENGTH];
   int linecount;
 };
-// * == -1
+// * is represented by -1 in the struct for the time values
 struct ScheduledTask {
   char programName[MAX_COMMAND_LENGTH + 1];
   int minute;
@@ -40,6 +36,7 @@ struct Estimate {
 struct Estimate estimates[MAX_COMMAND_COUNT];
 struct ScheduledTask tasks[MAX_COMMAND_COUNT];
 
+// Handling text to int conversion for ease of use later
 int monthConverter(char month[]) {
   if (strcmp(month, "jan") == 0) {
     return 0;
@@ -68,6 +65,8 @@ int monthConverter(char month[]) {
   } else if (*month == '*') {
     return -1;
   }
+  // Checking that the cotains no non-digits so that it can
+  // be compared between 0 and 12
   for (int j = 0; j < strlen(month); j++) {
     if (!isdigit(month[j])) {
       fprintf(stderr, "%s is not a valid month\n", month);
@@ -84,7 +83,7 @@ int monthConverter(char month[]) {
     exit(EXIT_FAILURE);
   }
 }
-
+// Handling text to int conversion for ease of use later
 int dayConverter(char day[]) {
   if (strcmp(day, "sun") == 0) {
     return 0;
@@ -103,6 +102,8 @@ int dayConverter(char day[]) {
   } else if (*day == '*') {
     return -1;
   }
+  // Checking that the cotains no non-digits so that it can
+  // be compared between 0 and 7
   for (int j = 0; j < strlen(day); j++) {
     if (!isdigit(day[j])) {
       fprintf(stderr, "%s is not a valid day of the week\n", day);
@@ -111,7 +112,9 @@ int dayConverter(char day[]) {
   }
   if (atoi(day) >= 0 && atoi(day) < 7) {
     return atoi(day);
-  } else {
+  }
+
+  else {
     fprintf(stderr, "%s is not a valid day of the week\n", day);
     exit(EXIT_FAILURE);
   }
@@ -126,6 +129,8 @@ int daysInMonth(int month) {
   return daysOfMonths[month];
 }
 
+// PARSES EXACT ARGUMENTS AND STORES INTO GLOBAL STRUCT
+// ARRAY OF TASKS OR ESTIMATES
 void parseData(struct Data filedata, int fileNum) {
   switch (fileNum) {
   // ESTIMATE PARSING
@@ -134,6 +139,7 @@ void parseData(struct Data filedata, int fileNum) {
       char *word = strtok(filedata.file_info[i], " \t\n\0");
       strcpy(estimates[i].programName, word);
       word = strtok(NULL, " \t\n\0");
+      // Checking for valid number of minutes before storing in struct
       for (int j = 0; j < strlen(word); j++) {
         if (!isdigit(word[j])) {
           fprintf(stderr, "%s is not a valid amount of minutes\n", word);
@@ -142,7 +148,9 @@ void parseData(struct Data filedata, int fileNum) {
       }
       estimates[i].minutes = atoi(word);
     }
+
     break;
+
   // SCHEDULE PARSING
   case 2:
     for (int i = 0; i < filedata.linecount; i++) {
@@ -153,6 +161,7 @@ void parseData(struct Data filedata, int fileNum) {
       }
 
       else {
+        // Checking validty of minutes before storing
         for (int j = 0; j < strlen(word); j++) {
           if (!isdigit(word[j])) {
             fprintf(stderr, "%s is not a valid amount of minutes\n", word);
@@ -171,6 +180,7 @@ void parseData(struct Data filedata, int fileNum) {
       if (*word == '*') {
         tasks->hour = -1;
       } else {
+        // Checking validty of hours before storing
         for (int j = 0; j < strlen(word); j++) {
           if (!isdigit(word[j])) {
             fprintf(stderr, "%s is not a valid amount of minutes\n", word);
@@ -187,6 +197,8 @@ void parseData(struct Data filedata, int fileNum) {
       // DAY OF MONTH (1-31)
       word = strtok(NULL, " \t\n\0");
       int days;
+      // Checking basic validty of days before storing in var
+      // actual date to month validity checked after month is tokenised
       if (*word == '*') {
         days = -1;
       } else {
@@ -202,6 +214,12 @@ void parseData(struct Data filedata, int fileNum) {
       // MONTH (0-11 OR jan,feb....)
       word = strtok(NULL, " \t\n\0");
       int month = monthConverter(word);
+      // Logic for day-month */! combinations:
+      //  *-!* :  no need to check: days unknown
+      //  !*-!* : Check if days is valid in month
+      //  *-* : No need to check, month unknown
+      //  !*-* : No need to check, month unknown
+
       if (month == -1 && days != -1) {
         tasks[i].month = month;
         if (days <= 31 && days >= 0) {
@@ -263,6 +281,8 @@ struct Data readfile(char file_name[]) {
   char line[MAX_LINE_LENGTH];
   while (fgets(line, sizeof line, file_data) != NULL) {
     int charCounter = 0;
+    // Iterating through line to find first non whitespace character
+    //  and check if it's a #
     while (isspace(line[charCounter])) {
       charCounter++;
     }
@@ -273,10 +293,17 @@ struct Data readfile(char file_name[]) {
     strcpy(data.file_info[line_number], line);
     line_number++;
   }
+  // Line numbers used for looping variables in the parsing
   data.linecount = line_number;
   // CLOSE FILE
   fclose(file_data);
   return data;
+}
+
+int getyear() {
+  time_t currenttime = time(NULL);
+  struct tm tm = *localtime(&currenttime);
+  return tm.tm_year;
 }
 
 int first_day_of_month(int month) {
@@ -288,7 +315,7 @@ int first_day_of_month(int month) {
   //  INITIALIZE THE FILEDS THAT WE ALREADY KNOW
   tm.tm_mday = 1;
   tm.tm_mon = month; // 0=Jan, 1=Feb, ....
-  tm.tm_year = CURRENT_YEAR - 1900;
+  tm.tm_year = getyear();
   mktime(&tm);
   //  RETURN THE INTEGER MONTH VALUE
   return tm.tm_wday; // 0=Sun, 1=Mon, .....
@@ -307,9 +334,13 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
   memset(processTimers, 0, sizeof(processTimers));
   int processCounter = 0;
   int currentMax = 0;
+  // Looping over each minute in the month
   for (int i = 0; i < minutesinMonth; i++) {
     // CHECK IF COMMAND NEEDS TO BE RUN
     for (int j = 0; j < numTasks; j++) {
+      // If every time value matches up to a task by iterating
+      //  through the schedule check if there is space in the array
+      // processTimers for the process to 'run'
       if ((tasks[j].minute == currMinute || tasks[j].minute == -1) &&
           (tasks[j].hour == currHour || tasks[j].hour == -1) &&
           (tasks[j].day == currDay || tasks[j].day == -1) &&
@@ -319,6 +350,8 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
         bool taskFound = false;
         int foundIndex;
         for (int k = 0; k < numEstimates; k++) {
+          // Finding the estimate value for the task by iterating over all the
+          // estimates
           if (strcmp(estimates[k].programName, tasks[j].programName) == 0) {
             taskFound = true;
             foundIndex = k;
@@ -335,7 +368,6 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
             }
           }
           if (!listFull) {
-            printf("THE PROGRAM %s WAS RUN\n", tasks[j].programName);
             processTimers[l] = estimates[foundIndex].minutes;
             timesRun[j] += 1;
             processCounter++;
@@ -347,20 +379,27 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
         }
       }
     }
+    // Keeping track of the max number of processes
+    // Over the month
     if (processCounter > currentMax) {
       currentMax = processCounter;
     }
     currMinute++;
+    // After a minute passses, decrement all process timers
     for (int j = 0; j < 20; j++) {
       if (processTimers[j] == 0) {
         continue;
       } else {
         processTimers[j]--;
+        // If the process timer is 0 after a decrement
+        // That means it is finished
         if (processTimers[j] == 0) {
           processCounter--;
         }
       }
     }
+    // Time is evalutated with a series of remainders %
+    // To allow for the 0-59,0-23 ect structure of time
     currMinute = currMinute % 60;
     if (currMinute == 0) {
       currHour++;
@@ -372,6 +411,8 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
       }
     }
   }
+  // Finding the task that was run the most
+  // As well as summing up the number of tasks run
   int mostRun = 0;
   int mostRunIndex = 0;
   int commandsInvoked = 0;
@@ -390,14 +431,16 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
 }
 
 int main(int argc, char *argv[]) {
+  if (argc != 4) {
+    printf("%d", argc);
+    fprintf(stderr, "Incorrect number of arguments, usage: ./estimatecron  "
+                    "month  crontab-file  estimates-file \n");
+    exit(EXIT_FAILURE);
+  }
   struct Data crontab = readfile(argv[2]);
-  printf("crontab read\n");
   struct Data estimates = readfile(argv[3]);
-  printf("estimates read\n");
   parseData(estimates, 1);
-  printf("estimates parsed\n");
   parseData(crontab, 2);
-  printf("crontab parsed\n");
   simulateMonth(atoi(argv[1]), crontab.linecount, estimates.linecount);
   return 0;
 }
