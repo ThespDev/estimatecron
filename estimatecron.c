@@ -175,9 +175,10 @@ void parseData(struct Data filedata, int fileNum) {
         tasks[i].minute = atoi(word);
       }
       // HOURS (0-23)
+
       word = strtok(NULL, " \t\n\0");
       if (*word == '*') {
-        tasks->hour = -1;
+        tasks[i].hour = -1;
       } else {
         // Checking validty of hours before storing
         for (int j = 0; j < strlen(word); j++) {
@@ -211,6 +212,7 @@ void parseData(struct Data filedata, int fileNum) {
         days = atoi(word);
       }
       // MONTH (0-11 OR jan,feb....)
+
       word = strtok(NULL, " \t\n\0");
       int month = monthConverter(word);
       // Logic for day-month */! combinations:
@@ -345,7 +347,6 @@ void simulateMonth(int month, int numTasks, int numEstimates) {
           (tasks[j].day == currDay || tasks[j].day == -1) &&
           (tasks[j].month == currMonth || tasks[j].month == -1) &&
           (tasks[j].dayOfWeek == currDayOfWeek || tasks[j].dayOfWeek == -1)) {
-
         bool taskFound = false;
         int foundIndex;
         for (int k = 0; k < numEstimates; k++) {
