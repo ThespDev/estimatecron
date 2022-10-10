@@ -1,6 +1,6 @@
 //  CITS2002 Project 1 2022
-//  Student1:   23137892   NAYDENOV   PABLO
-//  Student2:   22332371   BRYDON   RYAN
+//  Student1:
+//  Student2:
 
 #include <ctype.h>
 #include <stdbool.h>
